@@ -50,12 +50,12 @@ By the end of this lab, you will have a fully functional, two-process applicatio
 
 After completing this lab, you will be able to:
 
-- ✅ **Explain** why long-running AI tasks must not block HTTP request handlers
-- ✅ **Design** event-driven async workflows using Inngest's `step.run()` primitives
-- ✅ **Implement** durable execution with automatic retries and step memoization
-- ✅ **Engineer** effective prompts for structured JSON output from LLMs
-- ✅ **Build** defensive parsers that handle unpredictable LLM responses
-- ✅ **Apply** the polling pattern for async job status tracking
+- **Explain** why long-running AI tasks must not block HTTP request handlers
+- **Design** event-driven async workflows using Inngest's `step.run()` primitives
+- **Implement** durable execution with automatic retries and step memoization
+- **Engineer** effective prompts for structured JSON output from LLMs
+- **Build** defensive parsers that handle unpredictable LLM responses
+- **Apply** the polling pattern for async job status tracking
 - ✅ **Understand** the tradeoffs between in-memory storage and persistent databases
 
 ---
@@ -142,7 +142,7 @@ SafeSnippet Analyzer/
     └── package.json              ← Frontend dependencies
 ```
 
-[SCREENSHOT: Folder structure after cloning — expanded tree view in your file explorer or terminal]
+> 📸 **Screenshot:** Your project should look like this in the VS Code Explorer — the `SafeSnippet Analyzer` root containing `src/` (backend) and `frontend/` directories.
 
 **Why two separate directories?** The `src/` folder is the backend — a Node.js process running 24/7. The `frontend/` folder is a separate Vite development server that serves the React UI. In development, both run simultaneously. In production, the frontend would be built and served as static files from the Express server's `/public` directory.
 
@@ -163,7 +163,7 @@ This reads `package.json` and installs five production dependencies:
 | `inngest` | ^3.31.0 | Workflow orchestration SDK + Express middleware |
 | `uuid` | ^11.1.0 | Generates UUID v4 job IDs |
 
-[SCREENSHOT: Successful `npm install` — terminal showing packages added, no errors]
+> 📸 **Screenshot:** After running `npm install` you should see output like `added 5 packages` with no errors or vulnerabilities that stop execution.
 
 > **Why no test framework like Jest?** The lab uses a manual integration test script (`test/testAnalysis.js`) instead of unit tests. This keeps the setup simple while still exercising the full request→queue→process→poll flow.
 
@@ -211,7 +211,7 @@ require("dotenv").config();  // ← This is the VERY FIRST line of application c
 
 `dotenv` reads the `.env` file and populates `process.env` with its key-value pairs. If any module that reads `process.env.GOOGLE_API_KEY` is imported *before* `dotenv.config()` runs, it will see `undefined`. The `geminiService.js` reads `process.env.GOOGLE_API_KEY` at module load time (line 36), so `dotenv` must initialize first.
 
-[SCREENSHOT: The `.env` file open in a text editor with `GOOGLE_API_KEY` filled in]
+![.env file configured with GOOGLE_API_KEY and PORT in VS Code](docs/screenshots/env_config.png)
 
 ### Step 5 — Verify Setup
 
@@ -255,7 +255,7 @@ Expected response:
 }
 ```
 
-[SCREENSHOT: Terminal showing the startup banner and successful health check response]
+> 📸 **Screenshot:** Your terminal should display the startup banner with `✅ Configured` next to the Gemini API Key, and the `curl` health check should return `{"status":"healthy",...}`.
 
 ---
 
@@ -333,7 +333,9 @@ The `id` string is your application's identifier in the Inngest system. In the D
 
 For local development, the Dev Server trusts everything running on `localhost`, so these are not required.
 
-[SCREENSHOT: Inngest Dev Server dashboard at `http://localhost:8288` showing your app registered under "safesnippet-analyzer"]
+> 📸 **Screenshot:** Open [http://localhost:8288](http://localhost:8288) in your browser after starting the backend. You should see the Inngest Dev Server UI with your `safesnippet-analyzer` app listed under **Apps**.
+
+![Inngest Dev Server running at http://localhost:8288](docs/screenshots/inngest_dashboard_1.png)
 
 ---
 
@@ -544,7 +546,7 @@ const result = await model.generateContent({
 
 The `systemInstruction` is a first-class field in the Gemini API — it receives higher priority than regular user content, similar to how OpenAI's `system` role works.
 
-[SCREENSHOT: Gemini API dashboard showing API key usage and recent requests]
+> 📸 **Screenshot:** Check [https://aistudio.google.com](https://aistudio.google.com) → **API Keys** to verify your key is active and showing usage after running the first analysis.
 
 ---
 
@@ -676,9 +678,9 @@ On restart/retry:
 
 Step 2 (`call-gemini-api`) is the most expensive step: it costs tokens, takes 3-15 seconds, and counts against your rate limit. Without step-level memoization, any failure after the Gemini call (say, a crash in Step 3) would re-run the Gemini call on retry — wasting quota and time. With `step.run()`, Step 2's result is memoized: if Step 3 fails, Step 2 will not execute again on the retry.
 
-[SCREENSHOT: Inngest Dev Server showing a function run with all three steps marked green/completed]
+> 📸 **Screenshot:** In the Inngest Dev Server at [http://localhost:8288](http://localhost:8288), click on a completed function run. You should see all 3 steps (`update-status-processing`, `call-gemini-api`, `store-results`) marked ✅ green.
 
-[SCREENSHOT: Inngest Dev Server showing a function run that failed and retried — note Step 1 shows "memoized" on the second attempt]
+> 📸 **Screenshot:** If a function retries, the Inngest dashboard shows which steps were "memoized" (replayed from cache) vs. re-executed — demonstrating the crash-safe durable execution model.
 
 ---
 
@@ -764,7 +766,7 @@ app.get("/api/results/:jobId", (req, res) => {
 
 This is a **synchronous, non-blocking** endpoint — it simply reads from the in-memory Map and responds instantly. The polling client (frontend or test script) calls this every 2 seconds until `status === "completed"`.
 
-[SCREENSHOT: Terminal showing the Express server logging events — job queued, Inngest function executing, job completed]
+> 📸 **Screenshot:** Your backend terminal should log each stage: job creation, Inngest event dispatch, and the function completing successfully.
 
 ---
 
@@ -887,11 +889,11 @@ The `.glass-card` class implements **glassmorphism** — the frosted glass effec
 }
 ```
 
-[SCREENSHOT: The frontend running at `http://localhost:5173` — showing the code editor and Analyze button]
+> 📸 **Screenshot:** Open [http://localhost:5173](http://localhost:5173) in your browser. You should see the SafeSnippet Analyzer UI with a dark glassmorphism design, a code editor textarea, and the **Analyze Code** button.
 
-[SCREENSHOT: Frontend showing the StatusBar in "processing" state with spinning icon]
+> 📸 **Screenshot:** After clicking **Analyze**, the status bar animates to show a spinning indicator while the AI processes your code in the background.
 
-[SCREENSHOT: Frontend showing a completed analysis with vulnerability cards displayed]
+> 📸 **Screenshot:** When analysis completes, vulnerability cards appear showing each finding's type, severity badge, description, and recommended fix.
 
 ---
 
@@ -1426,7 +1428,4 @@ node test/testAnalysis.js   # End-to-end integration test
 
 **Returns:** `200 OK` with `{ status: "healthy", geminiConfigured: true|false }`
 
----
 
-*Lab developed for the DataCouch "Building Reliable AI Workflows with Node.js" training module.*
-*Architecture: Node.js + Express + Google Gemini 2.0 Flash + Inngest + React 19 + Vite*
