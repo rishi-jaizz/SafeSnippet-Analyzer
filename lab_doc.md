@@ -142,7 +142,7 @@ SafeSnippet Analyzer/
     └── package.json              ← Frontend dependencies
 ```
 
->  **Screenshot:** Your project should look like this in the VS Code Explorer — the `SafeSnippet Analyzer` root containing `src/` (backend) and `frontend/` directories.
+
 
 **Why two separate directories?** The `src/` folder is the backend — a Node.js process running 24/7. The `frontend/` folder is a separate Vite development server that serves the React UI. In development, both run simultaneously. In production, the frontend would be built and served as static files from the Express server's `/public` directory.
 
@@ -163,7 +163,7 @@ This reads `package.json` and installs five production dependencies:
 | `inngest` | ^3.31.0 | Workflow orchestration SDK + Express middleware |
 | `uuid` | ^11.1.0 | Generates UUID v4 job IDs |
 
->  **Screenshot:** After running `npm install` you should see output like `added 5 packages` with no errors or vulnerabilities that stop execution.
+
 
 > **Why no test framework like Jest?** The lab uses a manual integration test script (`test/testAnalysis.js`) instead of unit tests. This keeps the setup simple while still exercising the full request→queue→process→poll flow.
 
@@ -255,7 +255,7 @@ Expected response:
 }
 ```
 
->  **Screenshot:** Your terminal should display the startup banner with ` Configured` next to the Gemini API Key, and the `curl` health check should return `{"status":"healthy",...}`.
+
 
 ---
 
@@ -333,7 +333,7 @@ The `id` string is your application's identifier in the Inngest system. In the D
 
 For local development, the Dev Server trusts everything running on `localhost`, so these are not required.
 
->  **Screenshot:** Open [http://localhost:8288](http://localhost:8288) in your browser after starting the backend. You should see the Inngest Dev Server UI with your `safesnippet-analyzer` app listed under **Apps**.
+> Open [http://localhost:8288](http://localhost:8288) in your browser after starting the backend. You should see the Inngest Dev Server UI with your `safesnippet-analyzer` app listed under **Apps**.
 
 ![Inngest Dev Server running at http://localhost:8288](docs/screenshots/inngest_dashboard_1.png)
 
@@ -546,7 +546,7 @@ const result = await model.generateContent({
 
 The `systemInstruction` is a first-class field in the Gemini API — it receives higher priority than regular user content, similar to how OpenAI's `system` role works.
 
->  **Screenshot:** Check [https://aistudio.google.com](https://aistudio.google.com) → **API Keys** to verify your key is active and showing usage after running the first analysis.
+> Check [https://aistudio.google.com](https://aistudio.google.com) → **API Keys** to verify your key is active and showing usage after running the first analysis.
 
 ---
 
@@ -678,9 +678,9 @@ On restart/retry:
 
 Step 2 (`call-gemini-api`) is the most expensive step: it costs tokens, takes 3-15 seconds, and counts against your rate limit. Without step-level memoization, any failure after the Gemini call (say, a crash in Step 3) would re-run the Gemini call on retry — wasting quota and time. With `step.run()`, Step 2's result is memoized: if Step 3 fails, Step 2 will not execute again on the retry.
 
->  **Screenshot:** In the Inngest Dev Server at [http://localhost:8288](http://localhost:8288), click on a completed function run. You should see all 3 steps (`update-status-processing`, `call-gemini-api`, `store-results`) marked  green.
+> In the Inngest Dev Server at [http://localhost:8288](http://localhost:8288), click on a completed function run. You should see all 3 steps (`update-status-processing`, `call-gemini-api`, `store-results`) marked  green.
 
->  **Screenshot:** If a function retries, the Inngest dashboard shows which steps were "memoized" (replayed from cache) vs. re-executed — demonstrating the crash-safe durable execution model.
+> If a function retries, the Inngest dashboard shows which steps were "memoized" (replayed from cache) vs. re-executed — demonstrating the crash-safe durable execution model.
 
 ---
 
@@ -766,7 +766,7 @@ app.get("/api/results/:jobId", (req, res) => {
 
 This is a **synchronous, non-blocking** endpoint — it simply reads from the in-memory Map and responds instantly. The polling client (frontend or test script) calls this every 2 seconds until `status === "completed"`.
 
->  **Screenshot:** Your backend terminal should log each stage: job creation, Inngest event dispatch, and the function completing successfully.
+> Your backend terminal should log each stage: job creation, Inngest event dispatch, and the function completing successfully.
 
 ---
 
@@ -889,11 +889,11 @@ The `.glass-card` class implements **glassmorphism** — the frosted glass effec
 }
 ```
 
->  **Screenshot:** Open [http://localhost:5173](http://localhost:5173) in your browser. You should see the SafeSnippet Analyzer UI with a dark glassmorphism design, a code editor textarea, and the **Analyze Code** button.
+> Open [http://localhost:5173](http://localhost:5173) in your browser. You should see the SafeSnippet Analyzer UI with a dark glassmorphism design, a code editor textarea, and the **Analyze Code** button.
 
->  **Screenshot:** After clicking **Analyze**, the status bar animates to show a spinning indicator while the AI processes your code in the background.
+> After clicking **Analyze**, the status bar animates to show a spinning indicator while the AI processes your code in the background.
 
->  **Screenshot:** When analysis completes, vulnerability cards appear showing each finding's type, severity badge, description, and recommended fix.
+> When analysis completes, vulnerability cards appear showing each finding's type, severity badge, description, and recommended fix.
 
 ---
 
@@ -930,7 +930,6 @@ The Inngest Dev Server:
 
 **The Inngest Dev Server dashboard** is available at `http://localhost:8288`. You can inspect every event, every function run, each step's result, and any errors.
 
-[SCREENSHOT: Inngest Dev Server startup output showing functions discovered and dashboard URL]
 
 ### Terminal 3 — React Frontend (Optional)
 
@@ -941,7 +940,6 @@ npm run dev
 
 The React app will be available at `http://localhost:5173`.
 
-[SCREENSHOT: All three terminals running side by side — Express, Inngest, and Vite]
 
 ---
 
@@ -1020,7 +1018,6 @@ Poll every few seconds. You should see status progress: `pending` → `processin
 }
 ```
 
-[SCREENSHOT: curl terminal showing the completed analysis response]
 
 ---
 
@@ -1077,7 +1074,6 @@ This script:
    ...
 ```
 
-[SCREENSHOT: Full test script output showing all three vulnerabilities detected]
 
 ---
 
@@ -1090,7 +1086,6 @@ You should see:
 - The **Functions** tab listing `analyze-code-security`
 - Clicking a function run shows all three steps with their execution time and return values
 
-[SCREENSHOT: Inngest dashboard showing a completed function run with all three steps visible]
 
 ---
 
