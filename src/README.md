@@ -1,7 +1,6 @@
 # 🛡️ SafeSnippet Analyzer — Reference Solution
 
 > **AI-Powered Code Vulnerability Analyzer** built with Node.js, Google Gemini, and Inngest.
-> This is the complete reference solution for the "Building Reliable AI Workflows with Node.js" training lab.
 
 ---
 
@@ -148,6 +147,3 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 }
 ```
 
----
-
-*Built as the reference solution for the DataCouch "Building Reliable AI Workflows with Node.js" training module.*
