@@ -6,6 +6,8 @@
 
 ## Architecture
 
+![SafeSnippet Analyzer Architecture Diagram](../docs/screenshots/architecture.png)
+
 ```
 ┌─────────────┐        ┌──────────────────┐        ┌────────────────┐
 │             │  POST   │                  │ event  │                │
