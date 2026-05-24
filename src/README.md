@@ -8,35 +8,6 @@
 
 ![SafeSnippet Analyzer Architecture Diagram](../docs/screenshots/architecture.png)
 
-```
-┌─────────────┐        ┌──────────────────┐        ┌────────────────┐
-│             │  POST   │                  │ event  │                │
-│   Client    │───────▶│  Express API     │──────▶│  Inngest Dev   │
-│  (Browser/  │  202   │  (server.js)     │        │  Server        │
-│   curl)     │◀───────│                  │        │                │
-│             │  poll   │                  │        │                │
-│             │───────▶│  GET /results    │        │                │
-│             │  200   │                  │        │                │
-└─────────────┘◀───────└──────────────────┘        └───────┬────────┘
-                                                           │
-                                                           │ invoke
-                                                           ▼
-                                                   ┌────────────────┐
-                                                   │ analyzeCode()  │
-                                                   │ Inngest Func   │
-                                                   │                │
-                                                   │ Step 1: Mark   │
-                                                   │ Step 2: Gemini │
-                                                   │ Step 3: Store  │
-                                                   └───────┬────────┘
-                                                           │
-                                                           │ API call
-                                                           ▼
-                                                   ┌────────────────┐
-                                                   │  Google Gemini │
-                                                   │  2.0 Flash     │
-                                                   └────────────────┘
-```
 
 ## Project Structure
 
