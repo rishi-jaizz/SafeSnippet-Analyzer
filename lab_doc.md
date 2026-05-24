@@ -261,6 +261,8 @@ Expected response:
 
 ## 4. Architecture Deep Dive
 
+![SafeSnippet Lab Architecture](docs/screenshots/lab_architecture.png)
+
 Before diving into individual files, understand the **complete request lifecycle**:
 
 ```
