@@ -1,11 +1,6 @@
 # 🛡️ SafeSnippet Analyzer — Pre-Lab Technical Workshop
 ### *Building Reliable Async AI Backends with Node.js, Inngest, and Google Gemini*
 
-> **Audience:** Intern developers with JavaScript/Node.js experience  
-> **Duration:** ~45 minutes (lecture) + lab session  
-> **Lab Repository:** `SafeSnippet Analyzer` — `/src` (backend) + `/frontend` (React/Vite)
-
----
 
 ---
 
@@ -237,38 +232,7 @@ Annotate the missing `onFailure` handler as "⚠️ Lab Gap — Production TODO"
 
 ### 📊 Visual Description
 **Full system architecture diagram with all components and data flows:**  
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     BROWSER (React + Vite)                       │
-│   CodeEditor → POST /api/analyze → startPolling(jobId) →        │
-│                                    VulnerabilityCard[]           │
-└──────────────────────────┬──────────────────────────────────────┘
-                           │ HTTP (Vite proxy)
-┌──────────────────────────▼──────────────────────────────────────┐
-│                  EXPRESS SERVER (Node.js :3000)                  │
-│  POST /analyze → validate → uuid() → createJob() → send(event)  │
-│  GET /results/:id → getJob() → { status, result }               │
-│  /api/inngest → serve() → [discovery | function invocation]      │
-│                                                                  │
-│  ┌──────────────── resultsStore (Map) ──────────────────────┐   │
-│  │  jobId → { status: pending|processing|completed|failed } │   │
-│  └──────────────────────────────────────────────────────────┘   │
-└──────────────┬──────────────────────────▲───────────────────────┘
-               │ inngest.send(event)       │ Inngest invokes
-               │                          │ POST /api/inngest
-┌──────────────▼──────────────────────────┴───────────────────────┐
-│              INNGEST DEV SERVER (:8288)                          │
-│  Event Bus → Route "code/analyze.requested" →                   │
-│  Schedule function → Retry Engine (exp. backoff) → Dashboard    │
-└─────────────────────────────────────────────────────────────────┘
-               │ step.run("call-gemini-api")
-┌──────────────▼──────────────────────────────────────────────────┐
-│              GEMINI SERVICE (gemini-2.0-flash)                   │
-│  systemInstruction (OWASP persona + JSON schema)                 │
-│  + few-shot SQLi example + buildUserPrompt(code, language)       │
-│  → generateContent() → parseJsonFromLLM() → { riskLevel, ... }  │
-└─────────────────────────────────────────────────────────────────┘
-```
+![SafeSnippet Full Architecture](docs/screenshots/lab_architecture.png)
 
 ---
 

@@ -265,30 +265,6 @@ Expected response:
 
 Before diving into individual files, understand the **complete request lifecycle**:
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                      COMPLETE REQUEST LIFECYCLE                          │
-│                                                                         │
-│  1. User submits code                                                   │
-│     Browser → POST /api/analyze → Express                              │
-│                                                                         │
-│  2. Express generates jobId, creates "pending" job in resultsStore      │
-│     Fires event "code/analyze.requested" to Inngest                    │
-│     Returns HTTP 202 with jobId  (< 50ms)                              │
-│                                                                         │
-│  3. Inngest Dev Server receives event, routes to analyzeCodeFunction    │
-│                                                                         │
-│  4. analyzeCodeFunction runs 3 durable steps:                           │
-│     Step 1: markProcessing(jobId)   → updates store                    │
-│     Step 2: analyzeCodeWithAI()     → calls Gemini API (3-15 seconds)  │
-│     Step 3: markCompleted(jobId)    → stores result                    │
-│                                                                         │
-│  5. Meanwhile, frontend polls GET /api/results/:jobId every 2 seconds  │
-│     pending → processing → completed                                   │
-│                                                                         │
-│  6. When status === "completed", frontend renders the report            │
-└─────────────────────────────────────────────────────────────────────────┘
-```
 
 **Why this architecture and not a simple synchronous call?**
 
