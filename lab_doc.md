@@ -227,14 +227,15 @@ You should see a banner like this in your terminal:
 ```
 ╔══════════════════════════════════════════════════════════════╗
 ║                                                              ║
-║     SafeSnippet Analyzer — Server Running                  ║
+║     SafeSnippet Analyzer — Server Running                    ║
 ║                                                              ║
 ║   Local:    http://localhost:3000                            ║
 ║   Health:   http://localhost:3000/api/health                 ║
 ║   Inngest:  http://localhost:3000/api/inngest                ║
 ║                                                              ║
-║   Gemini API Key:  Configured                              ║
-║                                                              ╚══════════════════════════════════════════════════════════════╝
+║   Gemini API Key: Configured                                 ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
 ```
 
 > If you see ` MISSING — check .env` next to the Gemini API Key, go back and verify your `.env` file.
