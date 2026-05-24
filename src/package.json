@@ -1,0 +1,27 @@
+{
+  "name": "safesnippet-analyzer",
+  "version": "1.0.0",
+  "description": "AI-Powered Code Vulnerability Analyzer — Lab Reference Solution. Uses Node.js, Google Gemini, and Inngest for reliable async AI workflows.",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "inngest:dev": "npx inngest-cli@latest dev -u http://localhost:3000/api/inngest",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "ai",
+    "security",
+    "code-analysis",
+    "inngest",
+    "gemini"
+  ],
+  "author": "DataCouch Lab",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.0",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.0",
+    "inngest": "^3.31.0",
+    "uuid": "^11.1.0"
+  }
+}

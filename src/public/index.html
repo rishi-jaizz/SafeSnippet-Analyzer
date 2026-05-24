@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SafeSnippet Analyzer — AI Code Security</title>
+  <meta name="description" content="AI-Powered Code Vulnerability Analyzer. Paste your code, get instant security analysis powered by Google Gemini." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ================================================================
+       DESIGN SYSTEM — CSS Custom Properties
+       ================================================================ */
+    :root {
+      --bg-primary: #0a0e1a;
+      --bg-secondary: #111827;
+      --bg-card: #1a1f35;
+      --bg-input: #0d1224;
+      --border-color: #2a3150;
+      --border-focus: #6366f1;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-indigo: #6366f1;
+      --accent-cyan: #22d3ee;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-amber: #f59e0b;
+      --accent-orange: #f97316;
+      --gradient-primary: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7);
+      --gradient-glow: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.05));
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --shadow-card: 0 4px 24px rgba(0,0,0,0.3);
+      --shadow-glow: 0 0 40px rgba(99,102,241,0.12);
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+      --transition-fast: 180ms ease;
+    }
+
+    /* ================================================================
+       RESET & BASE
+       ================================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* subtle grid pattern */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(99,102,241,0.06) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(139,92,246,0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ================================================================
+       LAYOUT
+       ================================================================ */
+    .app-container {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 40px 24px 60px;
+    }
+
+    /* ================================================================
+       HEADER
+       ================================================================ */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .header__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 100px;
+      background: var(--gradient-glow);
+      border: 1px solid rgba(99,102,241,0.25);
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--accent-cyan);
+      letter-spacing: 0.03em;
+      margin-bottom: 16px;
+    }
+    .header__title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.25;
+    }
+    .header__subtitle {
+      color: var(--text-secondary);
+      font-size: 1.02rem;
+      margin-top: 8px;
+      max-width: 540px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ================================================================
+       FORM CARD
+       ================================================================ */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group:last-of-type { margin-bottom: 24px; }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      letter-spacing: 0.02em;
+    }
+
+    select, textarea {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      padding: 12px 14px;
+      transition: border-color var(--transition-fast);
+    }
+    select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+    }
+    select {
+      font-family: var(--font-sans);
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394a3b8' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 200px;
+      line-height: 1.7;
+    }
+    textarea::placeholder { color: var(--text-muted); }
+
+    /* ================================================================
+       BUTTON
+       ================================================================ */
+    .btn-analyze {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: var(--radius-md);
+      background: var(--gradient-primary);
+      color: #fff;
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity var(--transition-fast), transform var(--transition-fast);
+    }
+    .btn-analyze:hover:not(:disabled) {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+    .btn-analyze:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .btn-analyze .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    .btn-analyze.loading .spinner { display: block; }
+    .btn-analyze.loading .btn-label { display: none; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ================================================================
+       STATUS BAR
+       ================================================================ */
+    .status-bar {
+      margin-top: 20px;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: none;
+    }
+    .status-bar.show { display: flex; align-items: center; gap: 8px; }
+    .status-bar.pending {
+      background: rgba(245,158,11,0.1);
+      border: 1px solid rgba(245,158,11,0.25);
+      color: var(--accent-amber);
+    }
+    .status-bar.processing {
+      background: rgba(99,102,241,0.1);
+      border: 1px solid rgba(99,102,241,0.25);
+      color: #a5b4fc;
+    }
+    .status-bar.error {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.25);
+      color: var(--accent-red);
+    }
+
+    /* ================================================================
+       RESULTS
+       ================================================================ */
+    .results-section {
+      margin-top: 32px;
+      display: none;
+    }
+    .results-section.show { display: block; }
+
+    .results-section h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .risk-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .risk-badge.CRITICAL { background: rgba(239,68,68,0.15); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+    .risk-badge.HIGH     { background: rgba(249,115,22,0.15); color: #fdba74; border: 1px solid rgba(249,115,22,0.3); }
+    .risk-badge.MEDIUM   { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
+    .risk-badge.LOW      { background: rgba(34,211,238,0.1);  color: #67e8f9; border: 1px solid rgba(34,211,238,0.25); }
+    .risk-badge.SAFE     { background: rgba(16,185,129,0.12); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.25); }
+
+    .summary-text {
+      margin: 16px 0 20px;
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+      line-height: 1.7;
+      padding: 14px 16px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      border-left: 3px solid var(--accent-indigo);
+    }
+
+    /* Vulnerability cards */
+    .vuln-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      transition: border-color var(--transition-fast);
+    }
+    .vuln-card:hover { border-color: rgba(99,102,241,0.35); }
+    .vuln-card__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .vuln-card__type {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .vuln-card__meta {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .vuln-card__desc {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin-bottom: 10px;
+    }
+    .vuln-card__fix {
+      font-size: 0.84rem;
+      background: rgba(16,185,129,0.07);
+      border: 1px solid rgba(16,185,129,0.2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #86efac;
+      line-height: 1.6;
+    }
+    .vuln-card__fix strong { color: #6ee7b7; }
+
+    /* JSON toggle */
+    .json-toggle {
+      margin-top: 20px;
+    }
+    .json-toggle button {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-family: var(--font-sans);
+      font-size: 0.82rem;
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .json-toggle button:hover {
+      border-color: var(--accent-indigo);
+      color: var(--text-secondary);
+    }
+    .json-output {
+      margin-top: 12px;
+      display: none;
+    }
+    .json-output.show { display: block; }
+    .json-output pre {
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--accent-cyan);
+      line-height: 1.65;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- ============================================================
+         HEADER
+         ============================================================ -->
+    <header class="header">
+      <div class="header__badge">🛡️ AI-Powered Security</div>
+      <h1 class="header__title">SafeSnippet Analyzer</h1>
+      <p class="header__subtitle">
+        Paste your code below and let AI identify security vulnerabilities, insecure patterns, and compliance risks.
+      </p>
+    </header>
+
+    <!-- ============================================================
+         INPUT FORM
+         ============================================================ -->
+    <div class="card" id="input-card">
+      <div class="form-group">
+        <label for="language-select">Programming Language</label>
+        <select id="language-select">
+          <option value="javascript">JavaScript</option>
+          <option value="python">Python</option>
+          <option value="java">Java</option>
+          <option value="php">PHP</option>
+          <option value="go">Go</option>
+          <option value="ruby">Ruby</option>
+          <option value="csharp">C#</option>
+          <option value="typescript">TypeScript</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="code-input">Code Snippet</label>
+        <textarea
+          id="code-input"
+          placeholder="// Paste your code here for security analysis...&#10;&#10;const query = 'SELECT * FROM users WHERE id=' + userId;&#10;db.execute(query);"
+          spellcheck="false"
+        ></textarea>
+      </div>
+      <button class="btn-analyze" id="analyze-btn" type="button">
+        <span class="spinner"></span>
+        <span class="btn-label">🔍 Analyze for Vulnerabilities</span>
+      </button>
+
+      <!-- Status bar for polling feedback -->
+      <div class="status-bar" id="status-bar">
+        <span id="status-icon"></span>
+        <span id="status-text"></span>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         RESULTS SECTION
+         ============================================================ -->
+    <section class="results-section" id="results-section">
+      <h2>📋 Analysis Report</h2>
+      <div id="risk-badge-container"></div>
+      <div class="summary-text" id="summary-text"></div>
+      <div id="vulnerabilities-list"></div>
+
+      <div class="json-toggle">
+        <button id="json-toggle-btn" type="button">{ } View Raw JSON</button>
+        <div class="json-output" id="json-output">
+          <pre id="json-pre"></pre>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ==============================================================
+       CLIENT-SIDE JAVASCRIPT
+       ============================================================== -->
+  <script>
+    // ================================================================
+    // DOM REFERENCES
+    // ================================================================
+    const analyzeBtn      = document.getElementById('analyze-btn');
+    const codeInput       = document.getElementById('code-input');
+    const languageSelect  = document.getElementById('language-select');
+    const statusBar       = document.getElementById('status-bar');
+    const statusIcon      = document.getElementById('status-icon');
+    const statusText      = document.getElementById('status-text');
+    const resultsSection  = document.getElementById('results-section');
+    const riskBadgeCtr    = document.getElementById('risk-badge-container');
+    const summaryText     = document.getElementById('summary-text');
+    const vulnList        = document.getElementById('vulnerabilities-list');
+    const jsonToggleBtn   = document.getElementById('json-toggle-btn');
+    const jsonOutput      = document.getElementById('json-output');
+    const jsonPre         = document.getElementById('json-pre');
+
+    let pollInterval = null;
+
+    // ================================================================
+    // SUBMIT ANALYSIS
+    // ================================================================
+    analyzeBtn.addEventListener('click', async () => {
+      const code = codeInput.value.trim();
+      const language = languageSelect.value;
+
+      if (!code) {
+        showStatus('error', '⚠️', 'Please paste a code snippet before analyzing.');
+        return;
+      }
+
+      // Reset UI
+      analyzeBtn.classList.add('loading');
+      analyzeBtn.disabled = true;
+      resultsSection.classList.remove('show');
+      showStatus('pending', '⏳', 'Submitting code for analysis...');
+
+      try {
+        const res = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, language }),
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+          showStatus('error', '❌', data.error || 'Submission failed.');
+          resetButton();
+          return;
+        }
+
+        showStatus('processing', '⚙️', `Job queued (${data.jobId.slice(0, 8)}…). Waiting for AI analysis...`);
+        startPolling(data.jobId);
+      } catch (err) {
+        showStatus('error', '❌', 'Network error — is the server running?');
+        resetButton();
+      }
+    });
+
+    // ================================================================
+    // POLL FOR RESULTS
+    // ================================================================
+    function startPolling(jobId) {
+      if (pollInterval) clearInterval(pollInterval);
+
+      pollInterval = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/results/${jobId}`);
+          const data = await res.json();
+
+          if (data.status === 'completed') {
+            clearInterval(pollInterval);
+            pollInterval = null;
+            hideStatus();
+            resetButton();
+            renderResults(data.result);
+          } else if (data.status === 'failed') {
+            clearInterval(pollInterval);
+            pollInterval = null;
+            showStatus('error', '❌', `Analysis failed: ${data.error}`);
+            resetButton();
+          } else {
+            showStatus('processing', '⚙️', `Status: ${data.status}… AI is analyzing your code.`);
+          }
+        } catch {
+          // Ignore transient fetch errors during polling
+        }
+      }, 2000);
+    }
+
+    // ================================================================
+    // RENDER RESULTS
+    // ================================================================
+    function renderResults(result) {
+      // Risk badge
+      riskBadgeCtr.innerHTML = `<span class="risk-badge ${result.riskLevel}">${result.riskLevel}</span>`;
+
+      // Summary
+      summaryText.textContent = result.summary || 'No summary provided.';
+
+      // Vulnerability cards
+      vulnList.innerHTML = '';
+      if (result.vulnerabilities && result.vulnerabilities.length > 0) {
+        result.vulnerabilities.forEach((v, i) => {
+          vulnList.innerHTML += `
+            <div class="vuln-card">
+              <div class="vuln-card__header">
+                <span class="vuln-card__type">${escapeHtml(v.type)}</span>
+                <span class="risk-badge ${v.severity}" style="font-size:0.72rem;padding:3px 10px;">${v.severity}</span>
+              </div>
+              <div class="vuln-card__meta">Line ${v.line || '—'}</div>
+              <div class="vuln-card__desc">${escapeHtml(v.description)}</div>
+              <div class="vuln-card__fix"><strong>Fix:</strong> ${escapeHtml(v.recommendation)}</div>
+            </div>`;
+        });
+      } else {
+        vulnList.innerHTML = '<p style="color:var(--accent-green);">✅ No vulnerabilities detected.</p>';
+      }
+
+      // Raw JSON
+      jsonPre.textContent = JSON.stringify(result, null, 2);
+      jsonOutput.classList.remove('show');
+
+      resultsSection.classList.add('show');
+      resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ================================================================
+    // JSON TOGGLE
+    // ================================================================
+    jsonToggleBtn.addEventListener('click', () => {
+      jsonOutput.classList.toggle('show');
+      jsonToggleBtn.textContent = jsonOutput.classList.contains('show')
+        ? '✕ Hide Raw JSON'
+        : '{ } View Raw JSON';
+    });
+
+    // ================================================================
+    // HELPERS
+    // ================================================================
+    function showStatus(type, icon, text) {
+      statusBar.className = `status-bar show ${type}`;
+      statusIcon.textContent = icon;
+      statusText.textContent = text;
+    }
+    function hideStatus() {
+      statusBar.className = 'status-bar';
+    }
+    function resetButton() {
+      analyzeBtn.classList.remove('loading');
+      analyzeBtn.disabled = false;
+    }
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>
