@@ -1,4 +1,4 @@
-# 🛡️ SafeSnippet Analyzer — Hands-On Lab Guide
+#  SafeSnippet Analyzer — Hands-On Lab Guide
 
 > **Building Reliable AI Workflows with Node.js, Google Gemini & Inngest**
 > A professional training lab manual for developers learning production-grade async AI architecture.
@@ -56,7 +56,7 @@ After completing this lab, you will be able to:
 - **Engineer** effective prompts for structured JSON output from LLMs
 - **Build** defensive parsers that handle unpredictable LLM responses
 - **Apply** the polling pattern for async job status tracking
-- ✅ **Understand** the tradeoffs between in-memory storage and persistent databases
+-  **Understand** the tradeoffs between in-memory storage and persistent databases
 
 ---
 
@@ -84,7 +84,7 @@ After completing this lab, you will be able to:
 
 > **Free tier limits:** 15 requests per minute (RPM), 1 million tokens per day. More than enough for this lab.
 
-> **⚠️ Keep your API key secret.** Never commit it to version control. The `.gitignore` in this project excludes `.env` files to protect you.
+> **⚠ Keep your API key secret.** Never commit it to version control. The `.gitignore` in this project excludes `.env` files to protect you.
 
 ### No Inngest Account Needed
 
@@ -142,7 +142,7 @@ SafeSnippet Analyzer/
     └── package.json              ← Frontend dependencies
 ```
 
-> 📸 **Screenshot:** Your project should look like this in the VS Code Explorer — the `SafeSnippet Analyzer` root containing `src/` (backend) and `frontend/` directories.
+>  **Screenshot:** Your project should look like this in the VS Code Explorer — the `SafeSnippet Analyzer` root containing `src/` (backend) and `frontend/` directories.
 
 **Why two separate directories?** The `src/` folder is the backend — a Node.js process running 24/7. The `frontend/` folder is a separate Vite development server that serves the React UI. In development, both run simultaneously. In production, the frontend would be built and served as static files from the Express server's `/public` directory.
 
@@ -163,7 +163,7 @@ This reads `package.json` and installs five production dependencies:
 | `inngest` | ^3.31.0 | Workflow orchestration SDK + Express middleware |
 | `uuid` | ^11.1.0 | Generates UUID v4 job IDs |
 
-> 📸 **Screenshot:** After running `npm install` you should see output like `added 5 packages` with no errors or vulnerabilities that stop execution.
+>  **Screenshot:** After running `npm install` you should see output like `added 5 packages` with no errors or vulnerabilities that stop execution.
 
 > **Why no test framework like Jest?** The lab uses a manual integration test script (`test/testAnalysis.js`) instead of unit tests. This keeps the setup simple while still exercising the full request→queue→process→poll flow.
 
@@ -227,17 +227,17 @@ You should see a banner like this in your terminal:
 ```
 ╔══════════════════════════════════════════════════════════════╗
 ║                                                              ║
-║   🛡️  SafeSnippet Analyzer — Server Running                  ║
+║     SafeSnippet Analyzer — Server Running                  ║
 ║                                                              ║
 ║   Local:    http://localhost:3000                            ║
 ║   Health:   http://localhost:3000/api/health                 ║
 ║   Inngest:  http://localhost:3000/api/inngest                ║
 ║                                                              ║
-║   Gemini API Key: ✅ Configured                              ║
+║   Gemini API Key:  Configured                              ║
 ║                                                              ╚══════════════════════════════════════════════════════════════╝
 ```
 
-> If you see `❌ MISSING — check .env` next to the Gemini API Key, go back and verify your `.env` file.
+> If you see ` MISSING — check .env` next to the Gemini API Key, go back and verify your `.env` file.
 
 Test the health endpoint:
 
@@ -255,7 +255,7 @@ Expected response:
 }
 ```
 
-> 📸 **Screenshot:** Your terminal should display the startup banner with `✅ Configured` next to the Gemini API Key, and the `curl` health check should return `{"status":"healthy",...}`.
+>  **Screenshot:** Your terminal should display the startup banner with ` Configured` next to the Gemini API Key, and the `curl` health check should return `{"status":"healthy",...}`.
 
 ---
 
@@ -333,7 +333,7 @@ The `id` string is your application's identifier in the Inngest system. In the D
 
 For local development, the Dev Server trusts everything running on `localhost`, so these are not required.
 
-> 📸 **Screenshot:** Open [http://localhost:8288](http://localhost:8288) in your browser after starting the backend. You should see the Inngest Dev Server UI with your `safesnippet-analyzer` app listed under **Apps**.
+>  **Screenshot:** Open [http://localhost:8288](http://localhost:8288) in your browser after starting the backend. You should see the Inngest Dev Server UI with your `safesnippet-analyzer` app listed under **Apps**.
 
 ![Inngest Dev Server running at http://localhost:8288](docs/screenshots/inngest_dashboard_1.png)
 
@@ -546,7 +546,7 @@ const result = await model.generateContent({
 
 The `systemInstruction` is a first-class field in the Gemini API — it receives higher priority than regular user content, similar to how OpenAI's `system` role works.
 
-> 📸 **Screenshot:** Check [https://aistudio.google.com](https://aistudio.google.com) → **API Keys** to verify your key is active and showing usage after running the first analysis.
+>  **Screenshot:** Check [https://aistudio.google.com](https://aistudio.google.com) → **API Keys** to verify your key is active and showing usage after running the first analysis.
 
 ---
 
@@ -678,9 +678,9 @@ On restart/retry:
 
 Step 2 (`call-gemini-api`) is the most expensive step: it costs tokens, takes 3-15 seconds, and counts against your rate limit. Without step-level memoization, any failure after the Gemini call (say, a crash in Step 3) would re-run the Gemini call on retry — wasting quota and time. With `step.run()`, Step 2's result is memoized: if Step 3 fails, Step 2 will not execute again on the retry.
 
-> 📸 **Screenshot:** In the Inngest Dev Server at [http://localhost:8288](http://localhost:8288), click on a completed function run. You should see all 3 steps (`update-status-processing`, `call-gemini-api`, `store-results`) marked ✅ green.
+>  **Screenshot:** In the Inngest Dev Server at [http://localhost:8288](http://localhost:8288), click on a completed function run. You should see all 3 steps (`update-status-processing`, `call-gemini-api`, `store-results`) marked  green.
 
-> 📸 **Screenshot:** If a function retries, the Inngest dashboard shows which steps were "memoized" (replayed from cache) vs. re-executed — demonstrating the crash-safe durable execution model.
+>  **Screenshot:** If a function retries, the Inngest dashboard shows which steps were "memoized" (replayed from cache) vs. re-executed — demonstrating the crash-safe durable execution model.
 
 ---
 
@@ -766,7 +766,7 @@ app.get("/api/results/:jobId", (req, res) => {
 
 This is a **synchronous, non-blocking** endpoint — it simply reads from the in-memory Map and responds instantly. The polling client (frontend or test script) calls this every 2 seconds until `status === "completed"`.
 
-> 📸 **Screenshot:** Your backend terminal should log each stage: job creation, Inngest event dispatch, and the function completing successfully.
+>  **Screenshot:** Your backend terminal should log each stage: job creation, Inngest event dispatch, and the function completing successfully.
 
 ---
 
@@ -889,11 +889,11 @@ The `.glass-card` class implements **glassmorphism** — the frosted glass effec
 }
 ```
 
-> 📸 **Screenshot:** Open [http://localhost:5173](http://localhost:5173) in your browser. You should see the SafeSnippet Analyzer UI with a dark glassmorphism design, a code editor textarea, and the **Analyze Code** button.
+>  **Screenshot:** Open [http://localhost:5173](http://localhost:5173) in your browser. You should see the SafeSnippet Analyzer UI with a dark glassmorphism design, a code editor textarea, and the **Analyze Code** button.
 
-> 📸 **Screenshot:** After clicking **Analyze**, the status bar animates to show a spinning indicator while the AI processes your code in the background.
+>  **Screenshot:** After clicking **Analyze**, the status bar animates to show a spinning indicator while the AI processes your code in the background.
 
-> 📸 **Screenshot:** When analysis completes, vulnerability cards appear showing each finding's type, severity badge, description, and recommended fix.
+>  **Screenshot:** When analysis completes, vulnerability cards appear showing each finding's type, severity badge, description, and recommended fix.
 
 ---
 
@@ -962,7 +962,7 @@ curl http://localhost:3000/api/health
 }
 ```
 
-✅ If `geminiConfigured` is `false`, check your `.env` file.
+ If `geminiConfigured` is `false`, check your `.env` file.
 
 ---
 
@@ -1045,14 +1045,14 @@ This script:
 ║     SafeSnippet Analyzer — Integration Test                 ║
 ╚══════════════════════════════════════════════════════════════╝
 
-🏥 Step 1: Checking server health...
+ Step 1: Checking server health...
    Status: healthy
    Gemini configured: true
 
-📤 Step 2: Submitting javascript code for analysis...
+ Step 2: Submitting javascript code for analysis...
    Code length: 672 characters
 
-   ✅ Job accepted! ID: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+    Job accepted! ID: a1b2c3d4-e5f6-7890-abcd-ef1234567890
    HTTP Status: 202 (202 Accepted)
 
 ⏳ Step 3: Polling for results (checking every 2 seconds)...
@@ -1060,13 +1060,13 @@ This script:
    Attempt 1: status = pending ⏳
    Attempt 2: status = processing ⏳
    Attempt 3: status = processing ⏳
-   Attempt 4: status = completed ✅
+   Attempt 4: status = completed 
 
 ╔══════════════════════════════════════════════════════════════╗
-║     📋 VULNERABILITY ANALYSIS REPORT                       ║
+║      VULNERABILITY ANALYSIS REPORT                       ║
 ╚══════════════════════════════════════════════════════════════╝
 
-   Risk Level: 🔴 CRITICAL
+   Risk Level:  CRITICAL
 
    Found 3 vulnerabilities:
 
@@ -1399,8 +1399,8 @@ node test/testAnalysis.js   # End-to-end integration test
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `code` | string | ✅ | The source code snippet to analyze |
-| `language` | string | ✅ | Programming language (javascript, python, java, php, go, typescript) |
+| `code` | string |  | The source code snippet to analyze |
+| `language` | string |  | Programming language (javascript, python, java, php, go, typescript) |
 
 **Returns:** `202 Accepted` with `{ success: true, jobId: "uuid" }`
 
